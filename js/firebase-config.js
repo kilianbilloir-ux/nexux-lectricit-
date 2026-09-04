@@ -6,10 +6,10 @@
 // le code, même publié sur GitHub.
 
 export const firebaseConfig = {
-  apiKey: "REMPLACE_MOI",
-  authDomain: "REMPLACE_MOI.firebaseapp.com",
-  projectId: "REMPLACE_MOI",
-  storageBucket: "REMPLACE_MOI.appspot.com",
-  messagingSenderId: "REMPLACE_MOI",
-  appId: "REMPLACE_MOI",
+  apiKey: "AIzaSyCDYG6F8v2iyEErILa4g7zh2Y3O1lN-PxQ",
+  authDomain: "nexus-electricite.firebaseapp.com",
+  projectId: "nexus-electricite",
+  storageBucket: "nexus-electricite.firebasestorage.app",
+  messagingSenderId: "627796717715",
+  appId: "1:627796717715:web:cf20e2bb6961333d5cdd66",
 };
