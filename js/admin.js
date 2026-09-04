@@ -28,17 +28,14 @@ const db = getFirestore(app);
 
 const MOIS = ['jan', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
 const STATUTS = [
-  { value: 'a-confirmer', label: 'À confirmer', className: 'status-a-confirmer' },
+  { value: 'a-confirmer', label: 'Nouvelle demande', className: 'status-a-confirmer' },
   { value: 'confirme', label: 'Confirmé', className: 'status-confirme' },
+  { value: 'refuse', label: 'Refusé', className: 'status-refuse' },
   { value: 'termine', label: 'Terminé', className: 'status-termine' },
 ];
 
 function statusInfo(value) {
   return STATUTS.find((s) => s.value === value) || STATUTS[0];
-}
-function nextStatus(current) {
-  const idx = STATUTS.findIndex((s) => s.value === current);
-  return STATUTS[(idx + 1) % STATUTS.length].value;
 }
 function escapeHtml(str) {
   const div = document.createElement('div');
@@ -47,6 +44,41 @@ function escapeHtml(str) {
 }
 
 let unsubscribe = null;
+
+function agendaItemHtml(appt) {
+  const d = appt.date ? new Date(appt.date + 'T00:00:00') : null;
+  const day = d && !isNaN(d) ? d.getDate() : '--';
+  const month = d && !isNaN(d) ? MOIS[d.getMonth()] : '';
+  const status = statusInfo(appt.statut);
+  const nomComplet = [appt.prenom, appt.nom].filter(Boolean).join(' ') || appt.nom;
+  const tel = appt.telephone || appt.tel;
+
+  let actions = '';
+  if (appt.statut === 'a-confirmer') {
+    actions += `<button class="btn-mini confirm" data-action="confirm" data-id="${appt.id}">Confirmer</button>`;
+    actions += `<button class="btn-mini refuse" data-action="refuse" data-id="${appt.id}">Refuser</button>`;
+  } else if (appt.statut === 'confirme') {
+    actions += `<button class="btn-mini" data-action="terminer" data-id="${appt.id}">Marquer terminé</button>`;
+  }
+  if (tel) actions += `<a class="btn-mini" href="tel:${escapeHtml(tel)}">Appeler</a>`;
+  if (appt.email) actions += `<a class="btn-mini" href="mailto:${escapeHtml(appt.email)}">E-mail</a>`;
+  actions += `<button class="btn-mini refuse" data-action="delete" data-id="${appt.id}">Supprimer</button>`;
+
+  return `
+    <div class="agenda-item">
+      <div class="agenda-date"><span class="day">${day}</span><span class="month">${month}</span></div>
+      <div class="agenda-main">
+        <h3>${escapeHtml(nomComplet)} — ${escapeHtml(appt.intervention || '')}${appt.source === 'site' ? ' <span style="color:var(--gray-light); font-weight:400;">(via le site)</span>' : ''}</h3>
+        <p class="agenda-meta">${escapeHtml(appt.creneau || '')}${tel ? ' · ' + escapeHtml(tel) : ''}${appt.adresse ? ' · ' + escapeHtml(appt.adresse) : ''}${appt.email ? ' · ' + escapeHtml(appt.email) : ''}</p>
+        ${appt.description || appt.notes ? `<p class="agenda-notes">${escapeHtml(appt.description || appt.notes)}</p>` : ''}
+        <div class="agenda-quick-actions">${actions}</div>
+      </div>
+      <div class="agenda-actions">
+        <span class="status-badge ${status.className}" style="cursor:default;">${status.label}</span>
+      </div>
+    </div>
+  `;
+}
 
 function renderAgenda(items) {
   const container = document.getElementById('agenda-list');
@@ -58,30 +90,22 @@ function renderAgenda(items) {
     return;
   }
 
-  container.innerHTML = '';
-  items.forEach((appt) => {
-    const d = appt.date ? new Date(appt.date + 'T00:00:00') : null;
-    const day = d && !isNaN(d) ? d.getDate() : '--';
-    const month = d && !isNaN(d) ? MOIS[d.getMonth()] : '';
-    const status = statusInfo(appt.statut);
-    const nomComplet = [appt.prenom, appt.nom].filter(Boolean).join(' ') || appt.nom;
+  const nouvelles = items.filter((a) => a.statut === 'a-confirmer');
+  const reste = items
+    .filter((a) => a.statut !== 'a-confirmer')
+    .sort((a, b) => (a.date || '').localeCompare(b.date || ''));
 
-    const item = document.createElement('div');
-    item.className = 'agenda-item';
-    item.innerHTML = `
-      <div class="agenda-date"><span class="day">${day}</span><span class="month">${month}</span></div>
-      <div class="agenda-main">
-        <h3>${escapeHtml(nomComplet)} — ${escapeHtml(appt.intervention || '')}${appt.source === 'site' ? ' <span style="color:var(--gray-light); font-weight:400;">(via le site)</span>' : ''}</h3>
-        <p class="agenda-meta">${escapeHtml(appt.creneau || '')}${appt.telephone || appt.tel ? ' · ' + escapeHtml(appt.telephone || appt.tel) : ''}${appt.adresse ? ' · ' + escapeHtml(appt.adresse) : ''}${appt.email ? ' · ' + escapeHtml(appt.email) : ''}</p>
-        ${appt.description || appt.notes ? `<p class="agenda-notes">${escapeHtml(appt.description || appt.notes)}</p>` : ''}
-      </div>
-      <div class="agenda-actions">
-        <button class="status-badge ${status.className}" data-action="status" data-id="${appt.id}" data-current="${appt.statut}">${status.label}</button>
-        <button class="agenda-delete" data-action="delete" data-id="${appt.id}">Supprimer</button>
-      </div>
-    `;
-    container.appendChild(item);
-  });
+  let html = '';
+  if (nouvelles.length > 0) {
+    html += `<div class="agenda-group-title">Nouvelles demandes (${nouvelles.length})</div>`;
+    html += nouvelles.map(agendaItemHtml).join('');
+  }
+  if (reste.length > 0) {
+    html += `<div class="agenda-group-title">Planning</div>`;
+    html += reste.map(agendaItemHtml).join('');
+  }
+
+  container.innerHTML = html;
 }
 
 function startListening() {
@@ -100,11 +124,17 @@ document.getElementById('agenda-list')?.addEventListener('click', async (e) => {
   const btn = e.target.closest('button[data-action]');
   if (!btn) return;
 
-  if (btn.dataset.action === 'status') {
-    await updateDoc(doc(db, 'rendezvous', btn.dataset.id), { statut: nextStatus(btn.dataset.current) });
+  const ref = doc(db, 'rendezvous', btn.dataset.id);
+
+  if (btn.dataset.action === 'confirm') {
+    await updateDoc(ref, { statut: 'confirme' });
+  } else if (btn.dataset.action === 'refuse') {
+    await updateDoc(ref, { statut: 'refuse' });
+  } else if (btn.dataset.action === 'terminer') {
+    await updateDoc(ref, { statut: 'termine' });
   } else if (btn.dataset.action === 'delete') {
     if (confirm('Supprimer ce rendez-vous du planning ?')) {
-      await deleteDoc(doc(db, 'rendezvous', btn.dataset.id));
+      await deleteDoc(ref);
     }
   }
 });
