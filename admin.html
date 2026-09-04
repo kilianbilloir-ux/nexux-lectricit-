@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Planning — NEXUS ÉLECTRICITÉ (privé)</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="admin-banner">Page privée — connexion requise. Ne pas partager ce lien ni tes identifiants.</div>
+
+<header class="site-header">
+  <div class="wrap">
+    <a href="index.html" class="logo">
+      <svg class="bolt" viewBox="0 0 26 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M17 0L2 19H12L9 34L24 14H14L17 0Z" fill="#F4B400"/>
+      </svg>
+      NEXUS <span class="accent">ÉLECTRICITÉ</span>
+    </a>
+    <nav class="main-nav" id="main-nav">
+      <ul>
+        <li><a href="index.html">Site public</a></li>
+        <li><a href="#" id="logout-link" style="display:none;">Se déconnecter</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<section class="page-header">
+  <div class="wrap">
+    <h1>Mon planning</h1>
+    <p>Les demandes envoyées depuis le site apparaissent ici automatiquement, ainsi que celles que tu ajoutes toi-même.</p>
+  </div>
+</section>
+
+<!-- Écran de connexion -->
+<section class="admin-section" id="login-screen">
+  <div class="wrap" style="max-width:380px;">
+    <div class="admin-form-card" style="position:static;">
+      <h2>Connexion</h2>
+      <form id="login-form">
+        <div class="field">
+          <label for="login-email">E-mail</label>
+          <input type="email" id="login-email" required autocomplete="username">
+        </div>
+        <div class="field">
+          <label for="login-password">Mot de passe</label>
+          <input type="password" id="login-password" required autocomplete="current-password">
+        </div>
+        <p id="login-error" style="color:#c0392b; font-size:0.85rem; display:none; margin-bottom:14px;"></p>
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Se connecter</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Planning (visible une fois connecté) -->
+<section class="admin-section" id="planning-screen" style="display:none;">
+  <div class="wrap admin-layout">
+
+    <div class="admin-form-card">
+      <h2>Ajouter un rendez-vous</h2>
+      <form id="admin-form">
+        <div class="field">
+          <label for="a-nom">Client</label>
+          <input type="text" id="a-nom" required>
+        </div>
+        <div class="field">
+          <label for="a-tel">Téléphone</label>
+          <input type="tel" id="a-tel">
+        </div>
+        <div class="field">
+          <label for="a-intervention">Type d'intervention</label>
+          <select id="a-intervention">
+            <option value="Installation">Installation</option>
+            <option value="Dépannage">Dépannage</option>
+            <option value="Rénovation">Rénovation</option>
+            <option value="Éclairage">Éclairage</option>
+            <option value="Photovoltaïque">Photovoltaïque</option>
+            <option value="Borne de recharge">Borne de recharge</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="a-date">Date</label>
+          <input type="date" id="a-date" required>
+        </div>
+        <div class="field">
+          <label for="a-creneau">Créneau</label>
+          <select id="a-creneau">
+            <option value="8h-10h">8h - 10h</option>
+            <option value="10h-12h">10h - 12h</option>
+            <option value="13h-15h">13h - 15h</option>
+            <option value="15h-17h">15h - 17h</option>
+            <option value="17h-18h">17h - 18h</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="a-adresse">Adresse</label>
+          <input type="text" id="a-adresse">
+        </div>
+        <div class="field">
+          <label for="a-notes">Notes</label>
+          <textarea id="a-notes" style="min-height:70px"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Ajouter au planning</button>
+      </form>
+    </div>
+
+    <div>
+      <div class="admin-toolbar">
+        <h2>Rendez-vous</h2>
+        <span class="admin-count" id="admin-count"></span>
+      </div>
+      <div class="agenda-list" id="agenda-list"></div>
+    </div>
+
+  </div>
+</section>
+
+<script type="module" src="js/admin.js"></script>
+</body>
+</html>
