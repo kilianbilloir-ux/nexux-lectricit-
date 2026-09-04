@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prendre rendez-vous — NEXUS ÉLECTRICITÉ</title>
+<meta name="description" content="Demandez un rendez-vous avec NEXUS ÉLECTRICITÉ pour vos travaux d'installation, de dépannage ou de rénovation.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a href="index.html" class="logo">
+      <svg class="bolt" viewBox="0 0 26 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M17 0L2 19H12L9 34L24 14H14L17 0Z" fill="#F4B400"/>
+      </svg>
+      NEXUS <span class="accent">ÉLECTRICITÉ</span>
+    </a>
+    <nav class="main-nav" id="main-nav">
+      <ul>
+        <li><a href="index.html">Accueil</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="rendez-vous.html" aria-current="page">Rendez-vous</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+    <button class="nav-toggle" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="main-nav">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</header>
+
+<section class="page-header">
+  <div class="wrap">
+    <h1>Prendre rendez-vous</h1>
+    <p>Décrivez votre besoin, on revient vers vous pour confirmer un créneau.</p>
+  </div>
+</section>
+
+<section class="rdv-section">
+  <div class="wrap rdv-layout">
+
+    <div class="rdv-info">
+      <h2>Comment ça marche</h2>
+      <p>Au début, chaque demande est traitée manuellement : ce formulaire envoie une demande, pas une réservation automatique.</p>
+      <ol class="rdv-steps">
+        <li><span class="mark">1</span> Vous remplissez le formulaire avec votre besoin et vos disponibilités.</li>
+        <li><span class="mark">2</span> Nous vérifions nos disponibilités.</li>
+        <li><span class="mark">3</span> Nous vous recontactons pour confirmer le rendez-vous.</li>
+      </ol>
+    </div>
+
+    <div>
+      <div class="form-success" role="status">
+        Votre demande a bien été enregistrée. Nous vous recontactons rapidement pour confirmer votre rendez-vous.
+      </div>
+
+      <form class="rdv-form" novalidate>
+        <div class="form-row">
+          <div class="field">
+            <label for="nom">Nom</label>
+            <input type="text" id="nom" name="nom" required>
+            <p class="field-error">Merci d'indiquer votre nom.</p>
+          </div>
+          <div class="field">
+            <label for="prenom">Prénom</label>
+            <input type="text" id="prenom" name="prenom" required>
+            <p class="field-error">Merci d'indiquer votre prénom.</p>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="telephone">Téléphone</label>
+            <input type="tel" id="telephone" name="telephone" required>
+            <p class="field-error">Merci d'indiquer un numéro de téléphone.</p>
+          </div>
+          <div class="field">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" name="email" required>
+            <p class="field-error">Merci d'indiquer une adresse e-mail valide.</p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="intervention">Type d'intervention</label>
+          <select id="intervention" name="intervention" required>
+            <option value="">Sélectionnez une intervention</option>
+            <option value="installation">Installation</option>
+            <option value="depannage">Dépannage</option>
+            <option value="renovation">Rénovation</option>
+            <option value="eclairage">Éclairage</option>
+            <option value="photovoltaique">Photovoltaïque</option>
+            <option value="borne">Borne de recharge</option>
+            <option value="autre">Autre</option>
+          </select>
+          <p class="field-error">Merci de sélectionner un type d'intervention.</p>
+        </div>
+
+        <div class="field">
+          <label for="adresse">Adresse</label>
+          <input type="text" id="adresse" name="adresse" required>
+          <p class="field-error">Merci d'indiquer l'adresse d'intervention.</p>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label for="date">Date souhaitée</label>
+            <input type="date" id="date" name="date" required>
+            <p class="field-error">Merci d'indiquer une date souhaitée.</p>
+          </div>
+          <div class="field">
+            <label for="creneau">Créneau souhaité</label>
+            <select id="creneau" name="creneau" required>
+              <option value="">Sélectionnez un créneau</option>
+              <option value="matin">Matin</option>
+              <option value="apres-midi">Après-midi</option>
+              <option value="soir">Fin de journée</option>
+            </select>
+            <p class="field-error">Merci de sélectionner un créneau.</p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" placeholder="Décrivez votre besoin en quelques mots" required></textarea>
+          <p class="field-error">Merci de décrire brièvement votre besoin.</p>
+        </div>
+
+        <div class="field">
+          <label class="field-checkbox">
+            <input type="checkbox" id="accord" name="accord" required>
+            <span>J'accepte d'être recontacté au sujet de ma demande.</span>
+          </label>
+          <p class="field-error">Merci de cocher cette case pour envoyer la demande.</p>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Envoyer la demande</button>
+        <p class="form-note">Il s'agit d'une demande de rendez-vous : elle sera confirmée par téléphone ou e-mail.</p>
+      </form>
+    </div>
+
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a href="index.html" class="logo">
+          <svg class="bolt" viewBox="0 0 26 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M17 0L2 19H12L9 34L24 14H14L17 0Z" fill="#F4B400"/>
+          </svg>
+          NEXUS <span class="accent">ÉLECTRICITÉ</span>
+        </a>
+        <p>Installation · Dépannage · Rénovation</p>
+      </div>
+      <div>
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="rendez-vous.html">Rendez-vous</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="tel:+33000000000">01 23 45 67 89</a></li>
+          <li><a href="mailto:contact@nexus-electricite.fr">contact@nexus-electricite.fr</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; <span id="current-year"></span> NEXUS ÉLECTRICITÉ — Tous droits réservés.
+    </div>
+  </div>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>
