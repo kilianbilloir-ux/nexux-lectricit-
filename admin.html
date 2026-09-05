@@ -58,10 +58,30 @@
 
 <!-- Planning (visible une fois connecté) -->
 <section class="admin-section" id="planning-screen" style="display:none;">
-  <div class="wrap admin-layout">
+
+  <div class="wrap">
+    <div class="admin-tabs">
+      <button type="button" class="admin-tab active" data-tab="timetable">Emploi du temps</button>
+      <button type="button" class="admin-tab" data-tab="list">Demandes &amp; rendez-vous</button>
+    </div>
+  </div>
+
+  <div class="wrap tab-panel" id="tab-timetable">
+    <div class="timetable-toolbar">
+      <button type="button" class="btn-mini" id="week-prev">← Semaine précédente</button>
+      <h2 id="week-label">Semaine</h2>
+      <button type="button" class="btn-mini" id="week-next">Semaine suivante →</button>
+    </div>
+    <div class="timetable-wrap">
+      <table class="timetable" id="timetable"></table>
+    </div>
+  </div>
+
+  <div class="wrap admin-layout tab-panel" id="tab-list" style="display:none;">
 
     <div class="admin-form-card">
       <h2>Ajouter un rendez-vous</h2>
+
       <form id="admin-form">
         <div class="field">
           <label for="a-nom">Client</label>
