@@ -682,6 +682,29 @@ form.rdv-form {
 
 .admin-section { padding: 48px 0 88px; }
 
+.admin-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+
+.admin-tab {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 12px 18px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--gray);
+  cursor: pointer;
+}
+.admin-tab:hover { color: var(--navy); }
+.admin-tab.active { color: var(--navy); border-bottom-color: var(--yellow); }
+
+.tab-panel { margin-bottom: 0; }
+
 .admin-layout {
   display: grid;
   grid-template-columns: 340px 1fr;
@@ -822,4 +845,114 @@ form.rdv-form {
   .admin-form-card { position: static; }
   .agenda-item { grid-template-columns: auto 1fr; }
   .agenda-actions { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; }
+}
+
+/* --------------------------------------------------------------------------
+   Emploi du temps hebdomadaire (planning privé)
+   -------------------------------------------------------------------------- */
+
+.timetable-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.timetable-toolbar h2 {
+  font-size: 1.1rem;
+  text-align: center;
+  flex: 1;
+}
+
+.timetable-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+table.timetable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+  background: var(--white);
+}
+
+table.timetable th,
+table.timetable td {
+  border: 1px solid var(--border);
+  padding: 0;
+  vertical-align: top;
+}
+
+table.timetable thead th {
+  background: var(--navy);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 12px 8px;
+  text-align: center;
+}
+table.timetable thead th .tt-daynum {
+  display: block;
+  font-family: var(--font-body);
+  font-weight: 400;
+  color: rgba(255,255,255,0.65);
+  font-size: 0.78rem;
+  margin-top: 2px;
+}
+
+table.timetable .tt-time-col {
+  background: var(--bg);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--navy);
+  text-align: center;
+  padding: 10px 6px;
+  width: 78px;
+  white-space: nowrap;
+}
+
+.tt-cell { height: 84px; padding: 6px; }
+
+.tt-slot {
+  height: 100%;
+  border-radius: 4px;
+  padding: 8px 9px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  line-height: 1.3;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: filter 0.1s ease;
+}
+.tt-slot:hover { filter: brightness(0.97); }
+.tt-slot strong { font-family: var(--font-display); font-size: 0.85rem; }
+.tt-slot span { color: inherit; opacity: 0.85; }
+
+.tt-slot.status-a-confirmer { background: #fff3cd; }
+.tt-slot.status-confirme { background: #dff2e1; }
+.tt-slot.status-refuse { background: #fbe2e0; text-decoration: line-through; opacity: 0.7; }
+.tt-slot.status-termine { background: #e7e9ee; }
+
+.tt-empty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-light);
+  font-size: 1.1rem;
+}
+
+.agenda-item.highlight {
+  outline: 2px solid var(--yellow);
+  outline-offset: 2px;
+}
+
+@media (max-width: 700px) {
+  table.timetable { min-width: 620px; }
 }
