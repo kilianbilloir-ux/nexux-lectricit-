@@ -28,8 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!dateField.value) return true;
     const day = new Date(dateField.value + 'T00:00:00').getDay();
     if (day === 0 || day === 6) {
+      dateField.value = '';
       dateWrapper.classList.add('invalid');
-      dateError.textContent = 'Nous intervenons du lundi au vendredi uniquement.';
+      dateError.textContent = 'Nous intervenons du lundi au vendredi uniquement — merci de choisir un autre jour.';
       return false;
     }
     dateWrapper.classList.remove('invalid');
