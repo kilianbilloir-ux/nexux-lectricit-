@@ -107,14 +107,26 @@ function renderTimetable() {
   document.getElementById('timetable').innerHTML = html;
 }
 
+document.querySelectorAll('.admin-tab').forEach((tab) => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.admin-tab').forEach((t) => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-timetable').style.display = tab.dataset.tab === 'timetable' ? 'block' : 'none';
+    document.getElementById('tab-list').style.display = tab.dataset.tab === 'list' ? 'grid' : 'none';
+  });
+});
+
 document.getElementById('timetable')?.addEventListener('click', (e) => {
   const slot = e.target.closest('.tt-slot');
   if (!slot) return;
+  document.querySelector('.admin-tab[data-tab="list"]').click();
   const target = document.getElementById('agenda-item-' + slot.dataset.goto);
   if (!target) return;
-  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  target.classList.add('highlight');
-  setTimeout(() => target.classList.remove('highlight'), 1600);
+  setTimeout(() => {
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    target.classList.add('highlight');
+    setTimeout(() => target.classList.remove('highlight'), 1600);
+  }, 50);
 });
 
 document.getElementById('week-prev')?.addEventListener('click', () => {
