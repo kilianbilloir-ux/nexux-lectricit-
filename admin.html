@@ -63,6 +63,7 @@
     <div class="admin-tabs">
       <button type="button" class="admin-tab active" data-tab="timetable">Emploi du temps</button>
       <button type="button" class="admin-tab" data-tab="list">Demandes &amp; rendez-vous</button>
+      <button type="button" class="admin-tab" data-tab="chantier">Planning chantier</button>
     </div>
   </div>
 
@@ -138,6 +139,55 @@
     </div>
 
   </div>
+
+  <div class="wrap tab-panel" id="tab-chantier" style="display:none;">
+    <div class="timetable-toolbar">
+      <button type="button" class="btn-mini" id="chantier-week-prev">← Semaine précédente</button>
+      <h2 id="chantier-week-label">Semaine</h2>
+      <button type="button" class="btn-mini" id="chantier-week-next">Semaine suivante →</button>
+    </div>
+    <div class="timetable-wrap">
+      <table class="timetable chantier-timetable" id="chantier-timetable"></table>
+    </div>
+
+    <div class="admin-layout" style="margin-top:40px;">
+      <div class="admin-form-card">
+        <h2>Ajouter un chantier</h2>
+        <form id="chantier-form">
+          <div class="field">
+            <label for="c-employe">Employé</label>
+            <input type="text" id="c-employe" required>
+          </div>
+          <div class="field">
+            <label for="c-adresse">Adresse du chantier</label>
+            <input type="text" id="c-adresse" required>
+          </div>
+          <div class="field">
+            <label for="c-debut">Date de début</label>
+            <input type="date" id="c-debut" required>
+          </div>
+          <div class="field">
+            <label for="c-fin">Date de fin</label>
+            <input type="date" id="c-fin" required>
+          </div>
+          <div class="field">
+            <label for="c-notes">Notes</label>
+            <textarea id="c-notes" style="min-height:70px"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">Ajouter le chantier</button>
+        </form>
+      </div>
+
+      <div>
+        <div class="admin-toolbar">
+          <h2>Chantiers</h2>
+          <span class="admin-count" id="chantier-count"></span>
+        </div>
+        <div class="agenda-list" id="chantier-list"></div>
+      </div>
+    </div>
+  </div>
+
 </section>
 
 <script type="module" src="js/admin.js"></script>
