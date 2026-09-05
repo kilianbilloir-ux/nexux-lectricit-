@@ -19,6 +19,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const successBox = document.querySelector('.form-success');
   const submitBtn = form.querySelector('button[type="submit"]');
+  const dateField = form.querySelector('#date');
+  const dateWrapper = dateField.closest('.field');
+  const dateError = dateWrapper.querySelector('.field-error');
+  const DEFAULT_DATE_ERROR = dateError.textContent;
+
+  function checkWeekday() {
+    if (!dateField.value) return true;
+    const day = new Date(dateField.value + 'T00:00:00').getDay();
+    if (day === 0 || day === 6) {
+      dateWrapper.classList.add('invalid');
+      dateError.textContent = 'Nous intervenons du lundi au vendredi uniquement.';
+      return false;
+    }
+    dateWrapper.classList.remove('invalid');
+    dateError.textContent = DEFAULT_DATE_ERROR;
+    return true;
+  }
+
+  dateField.addEventListener('change', checkWeekday);
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -39,6 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
         emailField.closest('.field').classList.add('invalid');
       }
     }
+
+    if (!checkWeekday()) valid = false;
 
     if (!valid) {
       const firstInvalid = form.querySelector('.invalid');
