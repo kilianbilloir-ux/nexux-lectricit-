@@ -44,6 +44,89 @@ function escapeHtml(str) {
 }
 
 let unsubscribe = null;
+let latestItems = [];
+let weekStart = getMonday(new Date());
+
+const CRENEAUX = ['8h-10h', '10h-12h', '13h-15h', '15h-17h', '17h-18h'];
+const JOURS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi'];
+
+function getMonday(d) {
+  const date = new Date(d);
+  const day = date.getDay();
+  const diff = (day === 0 ? -6 : 1) - day;
+  date.setDate(date.getDate() + diff);
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function dateKey(d) {
+  return d.toISOString().slice(0, 10);
+}
+
+function formatWeekLabel(start) {
+  const end = new Date(start);
+  end.setDate(end.getDate() + 4);
+  const fmt = (d) => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+  return `Semaine du ${fmt(start)} au ${fmt(end)}`;
+}
+
+function renderTimetable() {
+  document.getElementById('week-label').textContent = formatWeekLabel(weekStart);
+
+  const weekDates = Array.from({ length: 5 }, (_, i) => {
+    const d = new Date(weekStart);
+    d.setDate(d.getDate() + i);
+    return d;
+  });
+
+  let html = '<thead><tr><th class="tt-time-col"></th>';
+  weekDates.forEach((d, i) => {
+    html += `<th>${JOURS[i]}<span class="tt-daynum">${d.getDate()}/${d.getMonth() + 1}</span></th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  CRENEAUX.forEach((creneau) => {
+    html += `<tr><td class="tt-time-col">${creneau}</td>`;
+    weekDates.forEach((d) => {
+      const key = dateKey(d);
+      const appt = latestItems.find((a) => a.date === key && a.creneau === creneau && a.statut !== 'refuse');
+      html += '<td class="tt-cell">';
+      if (appt) {
+        const status = statusInfo(appt.statut);
+        const nomComplet = [appt.prenom, appt.nom].filter(Boolean).join(' ') || appt.nom;
+        html += `<div class="tt-slot ${status.className}" data-goto="${appt.id}"><strong>${escapeHtml(nomComplet)}</strong><span>${escapeHtml(appt.intervention || '')}</span></div>`;
+      } else {
+        html += '<div class="tt-empty">—</div>';
+      }
+      html += '</td>';
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody>';
+  document.getElementById('timetable').innerHTML = html;
+}
+
+document.getElementById('timetable')?.addEventListener('click', (e) => {
+  const slot = e.target.closest('.tt-slot');
+  if (!slot) return;
+  const target = document.getElementById('agenda-item-' + slot.dataset.goto);
+  if (!target) return;
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  target.classList.add('highlight');
+  setTimeout(() => target.classList.remove('highlight'), 1600);
+});
+
+document.getElementById('week-prev')?.addEventListener('click', () => {
+  weekStart.setDate(weekStart.getDate() - 7);
+  weekStart = getMonday(weekStart);
+  renderTimetable();
+});
+document.getElementById('week-next')?.addEventListener('click', () => {
+  weekStart.setDate(weekStart.getDate() + 7);
+  weekStart = getMonday(weekStart);
+  renderTimetable();
+});
 
 function agendaItemHtml(appt) {
   const d = appt.date ? new Date(appt.date + 'T00:00:00') : null;
@@ -65,7 +148,7 @@ function agendaItemHtml(appt) {
   actions += `<button class="btn-mini refuse" data-action="delete" data-id="${appt.id}">Supprimer</button>`;
 
   return `
-    <div class="agenda-item">
+    <div class="agenda-item" id="agenda-item-${appt.id}">
       <div class="agenda-date"><span class="day">${day}</span><span class="month">${month}</span></div>
       <div class="agenda-main">
         <h3>${escapeHtml(nomComplet)} — ${escapeHtml(appt.intervention || '')}${appt.source === 'site' ? ' <span style="color:var(--gray-light); font-weight:400;">(via le site)</span>' : ''}</h3>
@@ -112,7 +195,9 @@ function startListening() {
   const q = query(collection(db, 'rendezvous'), orderBy('date', 'asc'));
   unsubscribe = onSnapshot(q, (snapshot) => {
     const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+    latestItems = items;
     renderAgenda(items);
+    renderTimetable();
   }, (err) => {
     console.error(err);
     document.getElementById('agenda-list').innerHTML =
