@@ -116,6 +116,7 @@ document.querySelectorAll('.admin-tab').forEach((tab) => {
     tab.classList.add('active');
     document.getElementById('tab-timetable').style.display = tab.dataset.tab === 'timetable' ? 'block' : 'none';
     document.getElementById('tab-list').style.display = tab.dataset.tab === 'list' ? 'grid' : 'none';
+    document.getElementById('tab-chantier').style.display = tab.dataset.tab === 'chantier' ? 'block' : 'none';
   });
 });
 
@@ -255,6 +256,129 @@ document.getElementById('admin-form')?.addEventListener('submit', async (e) => {
   e.target.reset();
 });
 
+/* ---------- Planning chantier ---------- */
+
+let unsubscribeChantiers = null;
+let latestChantiers = [];
+let chantierWeekStart = getMonday(new Date());
+const JOURS_7 = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+
+function renderChantierTimetable() {
+  document.getElementById('chantier-week-label').textContent = formatWeekLabel(chantierWeekStart);
+
+  const weekDates = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(chantierWeekStart);
+    d.setDate(d.getDate() + i);
+    return d;
+  });
+
+  let html = '<thead><tr><th class="tt-time-col"></th>';
+  weekDates.forEach((d, i) => {
+    html += `<th>${JOURS_7[i]}<span class="tt-daynum">${d.getDate()}/${d.getMonth() + 1}</span></th>`;
+  });
+  html += '</tr></thead><tbody><tr><td class="tt-time-col">Chantiers</td>';
+
+  weekDates.forEach((d) => {
+    const key = dateKey(d);
+    const actifs = latestChantiers.filter((c) => c.dateDebut <= key && c.dateFin >= key);
+    html += '<td class="tt-cell"><div class="chantier-day-cell">';
+    if (actifs.length === 0) {
+      html += '<div class="tt-empty">—</div>';
+    } else {
+      actifs.forEach((c) => {
+        html += `<div class="chantier-card"><strong>${escapeHtml(c.employe)}</strong><span>${escapeHtml(c.adresse || '')}</span></div>`;
+      });
+    }
+    html += '</div></td>';
+  });
+
+  html += '</tr></tbody>';
+  document.getElementById('chantier-timetable').innerHTML = html;
+}
+
+function renderChantierList(items) {
+  const container = document.getElementById('chantier-list');
+  const count = document.getElementById('chantier-count');
+  count.textContent = items.length + ' chantier' + (items.length > 1 ? 's' : '');
+
+  if (items.length === 0) {
+    container.innerHTML = '<div class="agenda-empty">Aucun chantier planifié.</div>';
+    return;
+  }
+
+  container.innerHTML = items
+    .slice()
+    .sort((a, b) => (a.dateDebut || '').localeCompare(b.dateDebut || ''))
+    .map((c) => {
+      const periode = c.dateDebut === c.dateFin
+        ? c.dateDebut
+        : `${c.dateDebut} → ${c.dateFin}`;
+      return `
+        <div class="agenda-item">
+          <div class="agenda-date"><span class="day" style="font-size:0.9rem;">📍</span></div>
+          <div class="agenda-main">
+            <h3>${escapeHtml(c.employe)}</h3>
+            <p class="agenda-meta">${escapeHtml(periode)}${c.adresse ? ' · ' + escapeHtml(c.adresse) : ''}</p>
+            ${c.notes ? `<p class="agenda-notes">${escapeHtml(c.notes)}</p>` : ''}
+          </div>
+          <div class="agenda-actions">
+            <button class="btn-mini refuse" data-chantier-delete="${c.id}">Supprimer</button>
+          </div>
+        </div>
+      `;
+    })
+    .join('');
+}
+
+function startListeningChantiers() {
+  unsubscribeChantiers = onSnapshot(collection(db, 'chantiers'), (snapshot) => {
+    latestChantiers = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+    renderChantierTimetable();
+    renderChantierList(latestChantiers);
+  }, (err) => {
+    console.error(err);
+    document.getElementById('chantier-list').innerHTML =
+      '<div class="agenda-empty">Impossible de charger le planning chantier.</div>';
+  });
+}
+
+document.getElementById('chantier-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const debut = document.getElementById('c-debut').value;
+  const fin = document.getElementById('c-fin').value;
+  if (fin < debut) {
+    alert('La date de fin doit être après la date de début.');
+    return;
+  }
+  await addDoc(collection(db, 'chantiers'), {
+    employe: document.getElementById('c-employe').value.trim(),
+    adresse: document.getElementById('c-adresse').value.trim(),
+    dateDebut: debut,
+    dateFin: fin,
+    notes: document.getElementById('c-notes').value.trim(),
+  });
+  e.target.reset();
+});
+
+document.getElementById('chantier-list')?.addEventListener('click', async (e) => {
+  const btn = e.target.closest('button[data-chantier-delete]');
+  if (!btn) return;
+  if (confirm('Supprimer ce chantier du planning ?')) {
+    await deleteDoc(doc(db, 'chantiers', btn.dataset.chantierDelete));
+  }
+});
+
+document.getElementById('chantier-week-prev')?.addEventListener('click', () => {
+  chantierWeekStart.setDate(chantierWeekStart.getDate() - 7);
+  chantierWeekStart = getMonday(chantierWeekStart);
+  renderChantierTimetable();
+});
+document.getElementById('chantier-week-next')?.addEventListener('click', () => {
+  chantierWeekStart.setDate(chantierWeekStart.getDate() + 7);
+  chantierWeekStart = getMonday(chantierWeekStart);
+  renderChantierTimetable();
+});
+
 /* ---------- Connexion ---------- */
 
 const loginForm = document.getElementById('login-form');
@@ -290,10 +414,12 @@ onAuthStateChanged(auth, (user) => {
     planningScreen.style.display = 'block';
     logoutLink.style.display = 'inline';
     if (!unsubscribe) startListening();
+    if (!unsubscribeChantiers) startListeningChantiers();
   } else {
     loginScreen.style.display = 'block';
     planningScreen.style.display = 'none';
     logoutLink.style.display = 'none';
     if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+    if (unsubscribeChantiers) { unsubscribeChantiers(); unsubscribeChantiers = null; }
   }
 });
