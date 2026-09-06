@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   dateField.addEventListener('change', checkWeekday);
+  dateField.addEventListener('input', checkWeekday);
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
